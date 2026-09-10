@@ -1,4 +1,4 @@
-﻿package com.maahi.iractvremote.billing
+package com.maahi.iractvremote.billing
 
 import android.app.Activity
 import android.content.Context
@@ -127,9 +127,10 @@ class DonationManager(private val context: Context) {
                         .setProductList(productList)
                         .build()
 
-                    billingClient.queryProductDetailsAsync(params) { queryResult, queryDetailsList ->
-                        if (queryResult.responseCode == BillingClient.BillingResponseCode.OK && queryDetailsList.isNotEmpty()) {
-                            val productDetails = queryDetailsList[0]
+                    billingClient.queryProductDetailsAsync(params) { queryResult, queryProductDetailsResult ->
+                        val detailsList = queryProductDetailsResult.productDetailsList
+                        if (queryResult.responseCode == BillingClient.BillingResponseCode.OK && !detailsList.isNullOrEmpty()) {
+                            val productDetails = detailsList[0]
                             val flowParams = BillingFlowParams.newBuilder()
                                 .setProductDetailsParamsList(
                                     listOf(
