@@ -164,7 +164,7 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = if (hasHardwareIr) "IR Blaster Ready (OnePlus 11R)" else "Simulation / Test Mode Active",
+                            text = if (hasHardwareIr) "IR Blaster Ready" else "Simulation / Test Mode Active",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (hasHardwareIr) Color(0xFF1B5E20) else Color(0xFFBF360C)
