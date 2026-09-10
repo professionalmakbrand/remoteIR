@@ -1,4 +1,4 @@
-# ProGuard Rules for IR remote ac tv freeware
+﻿# ProGuard Rules for IR remote ac tv freeware
 
 # 1. Kotlinx Serialization (Crucial for Navigation 3 and NavKey argument passing)
 -keepattributes *Annotation*, InnerClasses
@@ -19,13 +19,13 @@
 }
 
 # 2. Navigation 3 NavKeys
--keep class com.example.actvremotefreeware.**NavKey { *; }
--keep class com.example.actvremotefreeware.**NavKey$* { *; }
+-keep class com.maahi.iractvremote.**NavKey { *; }
+-keep class com.maahi.iractvremote.**NavKey$* { *; }
 
 # 3. Application Data Models and Enums (Preserve enum names for JSON and SharedPreferences)
--keep enum com.example.actvremotefreeware.model.** { *; }
--keep class com.example.actvremotefreeware.data.SavedRemote { *; }
--keep class com.example.actvremotefreeware.model.** { *; }
+-keep enum com.maahi.iractvremote.model.** { *; }
+-keep class com.maahi.iractvremote.data.SavedRemote { *; }
+-keep class com.maahi.iractvremote.model.** { *; }
 
 # 4. ZXing Barcode / QR Code Library
 -keep class com.google.zxing.** { *; }

@@ -1,14 +1,14 @@
-plugins {
+﻿plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
 }
 
 android {
-    namespace = "com.example.actvremotefreeware"
+    namespace = "com.maahi.iractvremote"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.example.actvremotefreeware"
+        applicationId = "com.maahi.iractvremote"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
