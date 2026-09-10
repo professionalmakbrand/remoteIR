@@ -1,0 +1,21 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+.kotlin/
+*.apk
+*.aab
+/app/release/
+
+# Downloaded reference repositories & research files
+Android-AC-Remote-master/
+IR-AC-Remote-master/
+hitachi_*.json
+hitachi_*.txt
+smartir_climate.md
