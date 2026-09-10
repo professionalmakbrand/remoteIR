@@ -1,4 +1,4 @@
-﻿package com.maahi.iractvremote.ui.dashboard
+package com.maahi.iractvremote.ui.dashboard
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -30,7 +30,9 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Sensors
 import androidx.compose.material.icons.filled.SensorsOff
 import androidx.compose.material.icons.filled.Tv
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +40,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -87,6 +90,7 @@ fun DashboardScreen(
     val donationManager = remember { DonationManager(context) }
 
     var remoteToShare by remember { mutableStateOf<SavedRemote?>(null) }
+    var remoteToDelete by remember { mutableStateOf<SavedRemote?>(null) }
     var showScanDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
     var showReminderDialog by remember {
@@ -195,7 +199,7 @@ fun DashboardScreen(
                             onPowerToggle = { onQuickPowerToggle(remote) },
                             onShare = { remoteToShare = remote },
                             onPinShortcut = { ShortcutUtils.pinRemoteShortcut(context, remote) },
-                            onDelete = { onDeleteRemote(remote) }
+                            onDelete = { remoteToDelete = remote }
                         )
                     }
 
@@ -268,6 +272,53 @@ fun DashboardScreen(
         SupportReminderDialog(
             donationManager = donationManager,
             onDismiss = { showReminderDialog = false }
+        )
+    }
+
+    // Delete Confirmation Dialog
+    if (remoteToDelete != null) {
+        val target = remoteToDelete!!
+        AlertDialog(
+            onDismissRequest = { remoteToDelete = null },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(28.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "Delete Remote?",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to delete \"${target.name}\" (${target.room})? This action cannot be undone."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onDeleteRemote(target)
+                        remoteToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.onError)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { remoteToDelete = null }
+                ) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }
