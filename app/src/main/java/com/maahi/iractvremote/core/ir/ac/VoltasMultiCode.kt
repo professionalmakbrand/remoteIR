@@ -1,39 +1,42 @@
-﻿package com.maahi.iractvremote.core.ir.ac
+package com.maahi.iractvremote.core.ir.ac
 
 import com.maahi.iractvremote.model.AcMode
 import com.maahi.iractvremote.model.AcState
 
 /**
  * Multi-code profiles for Voltas ACs covering classic window units, split ACs, and inverters:
- * - Code 1: Voltas Classic Window AC (NEC 32-bit @ 38kHz)
- * - Code 2: Voltas Vertis / Gold Classic Split (NEC 0x20DF)
+ * - Code 1: Voltas Inverter & Split (Native 80-bit, 122LZF / 183V MZJ3 Series)
+ * - Code 2: Voltas Gree OEM Split (64-bit Modulo-8)
  * - Code 3: Voltas All-Weather Inverter (Coolix 48-bit OEM)
- * - Code 4: Voltas Gree OEM Inverter (64-bit Modulo-8)
- * - Code 5: Voltas Standard Split (Sequence 3 / 148-Pulse)
+ * - Code 4: Voltas Vertis / Classic Split (NEC 0x20DF)
+ * - Code 5: Voltas Classic Window AC (NEC 32-bit @ 38kHz)
+ * - Code 6: Voltas Standard Split (Sequence 3 / 148-Pulse)
  */
 object VoltasMultiCode {
 
-    const val CODE_COUNT = 5
+    const val CODE_COUNT = 6
 
     fun getCodeDescription(index: Int): String {
         return when (index) {
-            0 -> "Code 1: Voltas Classic Window AC (NEC 32-bit)"
-            1 -> "Code 2: Voltas Vertis / Classic Split (0x20DF)"
+            0 -> "Code 1: Voltas Inverter & Split (Native 80-bit)"
+            1 -> "Code 2: Voltas Gree OEM Split (64-bit)"
             2 -> "Code 3: Voltas All-Weather Inverter (Coolix 48-bit)"
-            3 -> "Code 4: Voltas Gree OEM Inverter (64-bit)"
-            4 -> "Code 5: Voltas Standard Split (148-Pulse)"
+            3 -> "Code 4: Voltas Vertis / Classic Split (0x20DF)"
+            4 -> "Code 5: Voltas Classic Window AC (NEC 32-bit)"
+            5 -> "Code 6: Voltas Standard Split (148-Pulse)"
             else -> "Code ${index + 1}: Voltas Generic"
         }
     }
 
     fun encode(state: AcState, codeIndex: Int): Pair<Int, IntArray> {
         return when (codeIndex % CODE_COUNT) {
-            0 -> Pair(38000, encodeVoltasWindowNec(state))
-            1 -> Pair(38000, encodeVoltasVertisNec(state))
+            0 -> Pair(VoltasAcProtocol.FREQUENCY, VoltasAcProtocol.encode(state))
+            1 -> Pair(GreeAcProtocol.FREQUENCY, GreeAcProtocol.encode(state))
             2 -> Pair(LloydCoolixAcProtocol.FREQUENCY, LloydCoolixAcProtocol.encode(state))
-            3 -> Pair(GreeAcProtocol.FREQUENCY, GreeAcProtocol.encode(state))
-            4 -> SequenceAcProtocols.encode(state, 3)
-            else -> Pair(38000, encodeVoltasWindowNec(state))
+            3 -> Pair(38000, encodeVoltasVertisNec(state))
+            4 -> Pair(38000, encodeVoltasWindowNec(state))
+            5 -> SequenceAcProtocols.encode(state, 3)
+            else -> Pair(VoltasAcProtocol.FREQUENCY, VoltasAcProtocol.encode(state))
         }
     }
 

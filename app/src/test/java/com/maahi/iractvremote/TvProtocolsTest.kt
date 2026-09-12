@@ -1,4 +1,4 @@
-﻿package com.maahi.iractvremote
+package com.maahi.iractvremote
 
 import com.maahi.iractvremote.core.ir.ac.BrandCodeRegistry
 import com.maahi.iractvremote.core.ir.ac.CarrierMultiCode
@@ -76,8 +76,8 @@ class TvProtocolsTest {
         val state = AcState(power = true, temp = 24)
 
         // Voltas
-        assertEquals(5, VoltasMultiCode.CODE_COUNT)
-        for (i in 0 until 5) {
+        assertEquals(6, VoltasMultiCode.CODE_COUNT)
+        for (i in 0 until 6) {
             val (freq, pattern) = VoltasMultiCode.encode(state.copy(brand = AcBrand.VOLTAS), i)
             assertTrue(freq >= 36000)
             assertTrue(pattern.isNotEmpty())

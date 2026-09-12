@@ -1,4 +1,4 @@
-﻿package com.maahi.iractvremote
+package com.maahi.iractvremote
 
 import com.maahi.iractvremote.core.ir.ac.AcProtocolRouter
 import com.maahi.iractvremote.core.ir.ac.CarrierAcProtocol
@@ -8,6 +8,7 @@ import com.maahi.iractvremote.core.ir.ac.LgAcProtocol
 import com.maahi.iractvremote.core.ir.ac.LloydCoolixAcProtocol
 import com.maahi.iractvremote.core.ir.ac.OGeneralFujitsuAcProtocol
 import com.maahi.iractvremote.core.ir.ac.SequenceAcProtocols
+import com.maahi.iractvremote.core.ir.ac.VoltasAcProtocol
 import com.maahi.iractvremote.model.AcBrand
 import com.maahi.iractvremote.model.AcMode
 import com.maahi.iractvremote.model.AcState
@@ -130,6 +131,74 @@ class AcProtocolsTest {
         assertTrue("Gree pattern must not be empty", pattern.isNotEmpty())
         assertEquals("Gree header mark must be 9000µs", 9000, pattern[0])
         assertEquals("Gree header space must be 4500µs", 4500, pattern[1])
+    }
+
+    @Test
+    fun testVoltasProtocolSynthesis() {
+        val state = AcState(
+            brand = AcBrand.VOLTAS,
+            power = true,
+            temp = 24,
+            mode = AcMode.COOL,
+            fanSpeed = FanSpeed.LOW,
+            swing = false
+        )
+        val pattern = VoltasAcProtocol.encode(state)
+        // 10 bytes * 8 bits * 2 pulses + 2 footer pulses = 162 pulses
+        assertEquals("Voltas 80-bit frame length must be exactly 162 pulses", 162, pattern.size)
+        assertEquals("Voltas first mark should be 1026µs", 1026, pattern[0])
+        assertEquals("Voltas footer mark should be 1026µs", 1026, pattern[160])
+        assertEquals("Voltas footer space should be 40000µs", 40000, pattern[161])
+
+        // Decode pulses back to 10 bytes (MSB first)
+        val decodedBytes = IntArray(10)
+        for (byteIdx in 0 until 10) {
+            var b = 0
+            for (bit in 0 until 8) {
+                val space = pattern[byteIdx * 16 + bit * 2 + 1]
+                val bitVal = if (space > 1500) 1 else 0
+                b = (b shl 1) or bitVal
+            }
+            decodedBytes[byteIdx] = b
+        }
+
+        // Check decoded bytes match official specification:
+        // Byte 0: 0x33
+        // Byte 1: 0x88 (Fan Low 0x80 | Mode Cool 0x08)
+        // Byte 2: 0x88 (Power ON 0x80 | Fixed 0x08)
+        // Byte 3: 0x18 (Temp 24 -> 0x10 | (24-16))
+        // Bytes 4..8: 0x3B, 0x3B, 0x3B, 0x11, 0x00
+        // Byte 9: Checksum 0xE2
+        assertEquals(0x33, decodedBytes[0])
+        assertEquals(0x88, decodedBytes[1])
+        assertEquals(0x88, decodedBytes[2])
+        assertEquals(0x18, decodedBytes[3])
+        assertEquals(0x3B, decodedBytes[4])
+        assertEquals(0x3B, decodedBytes[5])
+        assertEquals(0x3B, decodedBytes[6])
+        assertEquals(0x11, decodedBytes[7])
+        assertEquals(0x00, decodedBytes[8])
+        assertEquals(0xE2, decodedBytes[9])
+
+        // Verify Swing ON changes Byte 2 to 0x8F and Checksum to 0xDB
+        val swingPattern = VoltasAcProtocol.encode(state.copy(swing = true))
+        assertEquals(162, swingPattern.size)
+        var swingByte2 = 0
+        for (bit in 0 until 8) {
+            val space = swingPattern[2 * 16 + bit * 2 + 1]
+            swingByte2 = (swingByte2 shl 1) or (if (space > 1500) 1 else 0)
+        }
+        assertEquals(0x8F, swingByte2)
+
+        // Verify Power OFF changes Byte 2 to 0x08
+        val offPattern = VoltasAcProtocol.encode(state.copy(power = false))
+        assertEquals(162, offPattern.size)
+        var offByte2 = 0
+        for (bit in 0 until 8) {
+            val space = offPattern[2 * 16 + bit * 2 + 1]
+            offByte2 = (offByte2 shl 1) or (if (space > 1500) 1 else 0)
+        }
+        assertEquals(0x08, offByte2)
     }
 
     @Test

@@ -1,4 +1,4 @@
-﻿package com.maahi.iractvremote.core.ir.ac
+package com.maahi.iractvremote.core.ir.ac
 
 import com.maahi.iractvremote.model.AcBrand
 import com.maahi.iractvremote.model.AcState
@@ -12,7 +12,7 @@ object BrandCodeRegistry {
     fun getCodeCount(brand: AcBrand): Int {
         return when (brand) {
             AcBrand.HITACHI -> HitachiMultiCode.CODE_COUNT // 10
-            AcBrand.VOLTAS -> VoltasMultiCode.CODE_COUNT // 5
+            AcBrand.VOLTAS -> VoltasMultiCode.CODE_COUNT // 6
             AcBrand.LLOYD -> LloydMultiCode.CODE_COUNT // 5
             AcBrand.LG -> LgMultiCode.CODE_COUNT // 5
             AcBrand.O_GENERAL -> OGeneralMultiCode.CODE_COUNT // 4
